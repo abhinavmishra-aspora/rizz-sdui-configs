@@ -1,0 +1,93 @@
+{
+  "body": [
+    {
+      "config": {
+        "id": "rizz-ticket-campaign",
+        "icon": "target",
+        "title": "Campaign & Attempt",
+        "sections": [
+          {
+            "id": "rizz-ticket-campaign-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Campaign",
+                "value": "$fn:getOrDefault($ticket.metadata.campaignId, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Cycle",
+                "value": "$fn:getOrDefault($ticket.metadata.cycleNumber, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Rank",
+                "value": "$fn:getOrDefault($ticket.metadata.rank, '-')"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 3
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-ticket-lifecycle",
+        "icon": "activity",
+        "title": "Lifecycle",
+        "sections": [
+          {
+            "id": "rizz-ticket-lifecycle-fields",
+            "items": [
+              {
+                "type": "badge",
+                "label": "Priority",
+                "value": "$fn:getOrDefault($ticket.priority, '-')",
+                "variant": "$fn:statusVariant($ticket.priority)"
+              },
+              {
+                "type": "text",
+                "label": "Ticket Reason",
+                "value": "$fn:humanize($fn:getOrDefault($ticket.ticketReason, '-'))"
+              },
+              {
+                "type": "text",
+                "label": "Closure Reason",
+                "value": "$fn:humanize($fn:getOrDefault($ticket.closureReason, '-'))"
+              },
+              {
+                "type": "text",
+                "label": "Last Updated",
+                "value": "$fn:formatDate($ticket.updatedAt)"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "ticket_details",
+  "layout": {
+    "mode": "vertical"
+  },
+  "dataSource": {
+    "ticket": {
+      "params": {
+        "ticketId": "{ticketId}"
+      },
+      "provider": "ticket"
+    }
+  },
+  "schemaVersion": "1.0.0"
+}

@@ -1,0 +1,108 @@
+{
+  "id": "rizz-call-callback-form",
+  "title": "Callback Today (today only)",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "icon": "pause-circle",
+      "label": "Hold for Today",
+      "variant": "primary",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "callback-section",
+      "type": "fieldset",
+      "fields": [
+        {
+          "id": "callbackDateTime",
+          "name": "callbackDateTime",
+          "type": "date",
+          "label": "Callback Time — TODAY only",
+          "helpText": "Pick a time LATER TODAY (lead's local time). The ticket is held with you; resume via Start Call. For a future date use the Answered form.",
+          "showTime": true,
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 12
+          }
+        },
+        {
+          "id": "notes",
+          "name": "notes",
+          "rows": 4,
+          "type": "textarea",
+          "label": "Notes",
+          "maxLength": 1000,
+          "isRequired": false,
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "placeholder": "Add notes about the callback request..."
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "description": "SAME-DAY callback only: lead asked to be called back LATER TODAY. Ticket goes ON_HOLD and stays with this agent — resume via Start Call. For a callback on a later date, use the Answered form's 'Answered - Callback Requested (later date)' option instead.",
+  "submitConfig": {
+    "client": "rizz-calling",
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/forms/rizz-call-callback-form/submit",
+    "onSuccess": {
+      "closeDrawer": true,
+      "showNotification": true
+    },
+    "pathParams": {
+      "currentAttemptRef": "$params.currentAttemptRef"
+    },
+    "operationId": "submit-feedback",
+    "postActions": [
+      {
+        "type": "transitionSubstatus",
+        "action": "HOLD_SAME_DAY_CALLBACK"
+      }
+    ],
+    "bodyTemplate": {
+      "notes": "$formData.notes",
+      "disposition": "ANSWERED_CALLBACK_REQUESTED",
+      "callbackSlot": "$formData.callbackDateTime"
+    },
+    "errorMessage": "Failed to schedule callback. Please try again.",
+    "successMessage": "Ticket held for today's callback."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+      "callbackDateTime"
+    ],
+    "properties": {
+      "notes": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "errorMessage": {
+      "required": {
+        "callbackDateTime": "Pick the callback date & time"
+      }
+    }
+  }
+}

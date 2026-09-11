@@ -1,0 +1,180 @@
+{
+  "id": "rizz-call-answered-form",
+  "title": "Answered",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "icon": "check-circle",
+      "label": "Submit",
+      "variant": "primary",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "answered-section",
+      "type": "fieldset",
+      "fields": [
+        {
+          "id": "disposition",
+          "name": "disposition",
+          "type": "singleSelect",
+          "label": "Disposition",
+          "options": [
+            {
+              "label": "Answered",
+              "value": "ANSWERED"
+            },
+            {
+              "label": "Answered - Callback Requested (later date)",
+              "value": "ANSWERED_CALLBACK_REQUESTED"
+            },
+            {
+              "label": "Answered - Not Interested",
+              "value": "ANSWERED_NOT_INTERESTED"
+            },
+            {
+              "label": "Answered - Grievance",
+              "value": "ANSWERED_GRIEVANCE"
+            },
+            {
+              "label": "Answered - DND Requested",
+              "value": "ANSWERED_DND"
+            },
+            {
+              "label": "Answered - Wrong Number",
+              "value": "ANSWERED_WRONG_NUMBER"
+            }
+          ],
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 12
+          }
+        },
+        {
+          "id": "callbackDateTime",
+          "name": "callbackDateTime",
+          "type": "date",
+          "label": "Callback Date & Time (a LATER date)",
+          "helpText": "Lead's local time, tomorrow or later. This ticket closes; Rizz re-dispatches a fresh ticket at that time. For today, use the Callback Today button.",
+          "showTime": true,
+          "isRequired": false,
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "visibleWhen": {
+            "field": "disposition",
+            "value": "ANSWERED_CALLBACK_REQUESTED",
+            "operator": "eq"
+          }
+        },
+        {
+          "id": "notes",
+          "name": "notes",
+          "rows": 4,
+          "type": "textarea",
+          "label": "Notes",
+          "maxLength": 1000,
+          "isRequired": false,
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "placeholder": "Add notes about the call..."
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "description": "Lead picked up. Covers every answered outcome INCLUDING a callback on a LATER DATE (pick 'Answered - Callback Requested (later date)' → date field appears). Ticket is RESOLVED/closed in all cases; for a later-date callback Rizz re-dispatches a fresh ticket at that slot. For a callback LATER TODAY use the 'Callback Today' button instead (that one holds the ticket with you).",
+  "submitConfig": {
+    "client": "rizz-calling",
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/forms/rizz-call-answered-form/submit",
+    "onSuccess": {
+      "closeDrawer": true,
+      "showNotification": true
+    },
+    "pathParams": {
+      "currentAttemptRef": "$params.currentAttemptRef"
+    },
+    "operationId": "submit-feedback",
+    "postActions": [
+      {
+        "type": "transitionSubstatus",
+        "action": "RESOLVE"
+      }
+    ],
+    "bodyTemplate": {
+      "notes": "$formData.notes",
+      "disposition": "$formData.disposition",
+      "callbackSlot": "$formData.callbackDateTime"
+    },
+    "errorMessage": "Failed to submit feedback. Please try again.",
+    "successMessage": "Feedback submitted."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "allOf": [
+      {
+        "if": {
+          "required": [
+            "disposition"
+          ],
+          "properties": {
+            "disposition": {
+              "const": "ANSWERED_CALLBACK_REQUESTED"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "callbackDateTime"
+          ]
+        }
+      }
+    ],
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+      "disposition"
+    ],
+    "properties": {
+      "notes": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "disposition": {
+        "enum": [
+          "ANSWERED",
+          "ANSWERED_CALLBACK_REQUESTED",
+          "ANSWERED_NOT_INTERESTED",
+          "ANSWERED_GRIEVANCE",
+          "ANSWERED_DND",
+          "ANSWERED_WRONG_NUMBER"
+        ],
+        "type": "string"
+      }
+    },
+    "errorMessage": {
+      "required": {
+        "disposition": "Please select a disposition",
+        "callbackDateTime": "Pick the callback date & time"
+      }
+    }
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "body": [
+    {
+      "config": {
+        "title": "Proactive Outbound Calling",
+        "actions": [
+          {
+            "id": "start_call",
+            "icon": "phone",
+            "label": "Start Call",
+            "method": "POST",
+            "variant": "success",
+            "endpoint": "/pulse-service/api/v1/tickets/$ticket.id/action",
+            "actionType": "apiCall",
+            "requestBody": {
+              "action": "START_CALL"
+            },
+            "visibleWhen": {
+              "field": "$ticket.substatus",
+              "value": [
+                "ASSIGNED",
+                "ON_HOLD"
+              ],
+              "operator": "in"
+            },
+            "successMessage": "Call started",
+            "requiredPermissions": [
+              "rizz-calling:ticket:call",
+              "rizz-calling:rizz-calling:ticket:call",
+              "rizz-calling:*",
+              "rizz-calling:rizz-calling:*"
+            ]
+          },
+          {
+            "id": "answered",
+            "icon": "check-circle",
+            "label": "Answered",
+            "variant": "success",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-call-answered-form?entityType=ticket&ticketId=$ticket.id&currentAttemptRef=$ticket.entityId",
+            "actionType": "openDrawer",
+            "visibleWhen": {
+              "field": "$ticket.substatus",
+              "value": "ON_CALL",
+              "operator": "eq"
+            },
+            "requiredPermissions": [
+              "rizz-calling:ticket:feedback",
+              "rizz-calling:rizz-calling:ticket:feedback",
+              "rizz-calling:*",
+              "rizz-calling:rizz-calling:*"
+            ]
+          },
+          {
+            "id": "not_answered",
+            "icon": "x-circle",
+            "label": "Not Answered",
+            "variant": "destructive",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-call-notanswered-form?entityType=ticket&ticketId=$ticket.id&currentAttemptRef=$ticket.entityId",
+            "actionType": "openDrawer",
+            "visibleWhen": {
+              "field": "$ticket.substatus",
+              "value": "ON_CALL",
+              "operator": "eq"
+            },
+            "requiredPermissions": [
+              "rizz-calling:ticket:feedback",
+              "rizz-calling:rizz-calling:ticket:feedback",
+              "rizz-calling:*",
+              "rizz-calling:rizz-calling:*"
+            ]
+          },
+          {
+            "id": "callback_today",
+            "icon": "pause-circle",
+            "label": "Callback Today",
+            "variant": "warning",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-call-callback-form?entityType=ticket&ticketId=$ticket.id&currentAttemptRef=$ticket.entityId",
+            "actionType": "openDrawer",
+            "visibleWhen": {
+              "field": "$ticket.substatus",
+              "value": "ON_CALL",
+              "operator": "eq"
+            },
+            "requiredPermissions": [
+              "rizz-calling:ticket:feedback",
+              "rizz-calling:rizz-calling:ticket:feedback",
+              "rizz-calling:*",
+              "rizz-calling:rizz-calling:*"
+            ]
+          },
+          {
+            "id": "cancel",
+            "icon": "x",
+            "label": "Cancel",
+            "method": "POST",
+            "confirm": {
+              "icon": "x",
+              "title": "Cancel Ticket",
+              "actions": [
+                {
+                  "id": "cancel_cancel",
+                  "label": "Go Back",
+                  "variant": "outline",
+                  "actionType": "closeConfirmationDialog"
+                },
+                {
+                  "id": "confirm_cancel",
+                  "label": "Cancel Ticket",
+                  "method": "POST",
+                  "variant": "destructive",
+                  "endpoint": "/pulse-service/api/v1/tickets/$ticket.id/action",
+                  "actionType": "apiCall",
+                  "requestBody": {
+                    "action": "CANCEL"
+                  },
+                  "successMessage": "Ticket cancelled"
+                }
+              ],
+              "message": "Are you sure you want to cancel this ticket?"
+            },
+            "variant": "outline",
+            "endpoint": "/pulse-service/api/v1/tickets/$ticket.id/action",
+            "actionType": "apiCall",
+            "requestBody": {
+              "action": "CANCEL"
+            },
+            "visibleWhen": {
+              "field": "$ticket.substatus",
+              "value": [
+                "REQUESTED",
+                "ASSIGNED",
+                "ON_CALL",
+                "ON_HOLD"
+              ],
+              "operator": "in"
+            },
+            "successMessage": "Ticket cancelled",
+            "requiredPermissions": [
+              "rizz-calling:ticket:cancel",
+              "rizz-calling:rizz-calling:ticket:cancel",
+              "rizz-calling:*",
+              "rizz-calling:rizz-calling:*"
+            ]
+          }
+        ],
+        "metadata": [
+          {
+            "label": "Ticket ID",
+            "value": "$fn:getOrDefault($ticket.id, '-')",
+            "copyable": true
+          },
+          {
+            "label": "Attempt Ref",
+            "value": "$fn:getOrDefault($ticket.entityId, '-')",
+            "copyable": true
+          },
+          {
+            "label": "Assignee",
+            "value": "$fn:getOrDefault($ticket.assigneeEmail, 'Unassigned')"
+          },
+          {
+            "label": "Created",
+            "value": "$fn:formatDateTime($ticket.createdAt)"
+          }
+        ],
+        "subtitle": "User: $fn:getOrDefault($ticket.customerId, '-')",
+        "titleBadge": {
+          "label": "$fn:humanize($fn:getOrDefault($ticket.subCategoryCode, '-'))",
+          "variant": "default"
+        },
+        "statusPills": [
+          {
+            "label": "Cohort",
+            "value": "$fn:humanize($fn:getOrDefault($leadContext.cohort, '-'))",
+            "variant": "info"
+          },
+          {
+            "label": "LOB",
+            "value": "$fn:getOrDefault($ticket.metadata.businessSegment, '-')",
+            "variant": "info"
+          },
+          {
+            "label": "Call Type",
+            "value": "$fn:humanize($fn:getOrDefault($ticket.metadata.callType, '-'))",
+            "variant": "info"
+          },
+          {
+            "label": "Attempt",
+            "value": "$fn:getOrDefault($leadContext.attemptNo, '-') of 4",
+            "variant": "default"
+          },
+          {
+            "icon": "clock",
+            "label": "Callback at",
+            "value": "$fn:formatDateTime($leadContext.scheduledTime)",
+            "variant": "warning",
+            "visibleWhen": {
+              "field": "$ticket.metadata.callType",
+              "value": "SCHEDULED_CALLBACK",
+              "operator": "eq"
+            }
+          },
+          {
+            "label": "Poor Experience",
+            "value": "Handle with care",
+            "variant": "warning",
+            "visibleWhen": {
+              "field": "$ticket.metadata.poorExperience",
+              "value": "true",
+              "operator": "eq"
+            }
+          },
+          {
+            "label": "Status",
+            "value": "$fn:getOrDefault($ticket.status, '-')",
+            "variant": "$fn:statusVariant($ticket.status)"
+          },
+          {
+            "label": "Substatus",
+            "value": "$fn:humanize($fn:getOrDefault($ticket.substatus, '-'))",
+            "variant": "$fn:substatusVariant($ticket.substatus)"
+          },
+          {
+            "icon": "clock",
+            "label": "SLA",
+            "value": "$fn:getOrDefault($ticket.slaStatus, '-')",
+            "variant": "$fn:slaVariant($ticket.slaStatus)"
+          }
+        ]
+      },
+      "widgetType": "ENTITY_HEADER",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "tabs": [
+          {
+            "id": "lead_context",
+            "label": "Lead Context",
+            "isDefault": true
+          },
+          {
+            "id": "customer_profile",
+            "label": "Customer"
+          },
+          {
+            "id": "ticket_details",
+            "label": "Ticket Details"
+          }
+        ],
+        "contentEndpoint": "/pulse-service/api/v1/page/rizz-calling-ticket-details/$ticket.id?tab={tabId}"
+      },
+      "widgetType": "TABS",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "footer": null,
+  "header": null,
+  "pageId": "rizz-calling-ticket-details",
+  "dataSource": {
+    "ticket": {
+      "params": {
+        "ticketId": "{ticketId}"
+      },
+      "provider": "ticket"
+    },
+    "leadContext": {
+      "client": "rizz-calling",
+      "params": {
+        "attemptId": "$ticket.entityId"
+      },
+      "endpoint": "get-context",
+      "dependsOn": [
+        "ticket"
+      ]
+    }
+  },
+  "schemaVersion": "1.0.0"
+}

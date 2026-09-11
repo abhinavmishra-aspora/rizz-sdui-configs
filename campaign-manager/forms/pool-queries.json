@@ -1,0 +1,162 @@
+{
+  "id": "rizz-pool-queries-form",
+  "title": "Pool Query",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "label": "Save query",
+      "variant": "primary",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "pool-query-config",
+      "type": "fieldset",
+      "title": "Config",
+      "fields": [
+        {
+          "id": "churnDaysThreshold",
+          "min": 1,
+          "name": "churnDaysThreshold",
+          "type": "number",
+          "label": "Churn threshold (days)",
+          "helpText": "Fills {{CHURN_DAYS_THRESHOLD}}.",
+          "layoutItem": {
+            "colSpan": 3
+          },
+          "defaultValue": "$combined.churnDaysThreshold"
+        },
+        {
+          "id": "minSignupDays",
+          "min": 1,
+          "name": "minSignupDays",
+          "type": "number",
+          "label": "Min signup age (days)",
+          "helpText": "Fills {{MIN_SIGNUP_DAYS}}.",
+          "layoutItem": {
+            "colSpan": 3
+          },
+          "defaultValue": "$combined.minSignupDays"
+        },
+        {
+          "id": "regions",
+          "name": "regions",
+          "type": "text",
+          "label": "Regions (CSV)",
+          "helpText": "Fills {{REGIONS}}, e.g. AE,GB.",
+          "layoutItem": {
+            "colSpan": 3
+          },
+          "defaultValue": "$combined.regions"
+        },
+        {
+          "id": "poolLimit",
+          "min": 1,
+          "name": "poolLimit",
+          "type": "number",
+          "label": "Pool size per cohort",
+          "helpText": "Fills {{POOL_LIMIT}}.",
+          "layoutItem": {
+            "colSpan": 3
+          },
+          "defaultValue": "$combined.poolLimit"
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    },
+    {
+      "id": "combined-sql",
+      "type": "fieldset",
+      "title": "Combined pool query (editable — {{TOKENS}} filled from the config above)",
+      "fields": [
+        {
+          "id": "sql",
+          "name": "sql",
+          "rows": 16,
+          "type": "textarea",
+          "label": "SQL",
+          "helpText": "Edit the query and/or the config, then Save. Leave {{TOKENS}} in place — they're substituted from the config.",
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "defaultValue": "$combined.sql"
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "dataSources": {
+    "combined": {
+      "client": "rizz-calling",
+      "params": {
+        "lob": "REMITTANCE"
+      },
+      "endpoint": "get-combined-query"
+    }
+  },
+  "description": "Write or edit the one combined pool query (both cohorts). Save loads it into the service and parses its {{TOKENS}}; the Pool Query tab then shows it read-only. The four config knobs below fill the campaign-backed tokens.",
+  "submitConfig": {
+    "client": "rizz-calling",
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/forms/rizz-pool-queries-form/submit",
+    "onSuccess": {
+      "closeDrawer": true,
+      "refreshPage": true,
+      "showNotification": true
+    },
+    "pathParams": {
+      "lob": "REMITTANCE"
+    },
+    "operationId": "update-combined-query",
+    "bodyTemplate": {
+      "sql": "$formData.sql",
+      "regions": "$formData.regions",
+      "poolLimit": "$formData.poolLimit",
+      "minSignupDays": "$formData.minSignupDays",
+      "churnDaysThreshold": "$formData.churnDaysThreshold"
+    },
+    "errorMessage": "Failed to save the combined query. Please try again.",
+    "successMessage": "Combined query saved. The Pool Query tab now shows it."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "properties": {
+      "sql": {
+        "type": "string"
+      },
+      "regions": {
+        "type": "string"
+      },
+      "poolLimit": {
+        "type": "number"
+      },
+      "minSignupDays": {
+        "type": "number"
+      },
+      "churnDaysThreshold": {
+        "type": "number"
+      }
+    }
+  }
+}

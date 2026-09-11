@@ -1,0 +1,76 @@
+{
+  "id": "rizz-upload-leads-form",
+  "title": "Upload Leads",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "label": "Upload",
+      "variant": "primary",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "upload-details",
+      "type": "fieldset",
+      "fields": [
+        {
+          "id": "file",
+          "name": "file",
+          "type": "file",
+          "label": "Leads CSV",
+          "accept": ".csv",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 12
+          }
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "description": "Upload the combined pool CSV (both cohorts in one file). Each row self-labels via its cohort column. Loads the pool only — no tickets.",
+  "submitConfig": {
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/data/upload/rizz-calling/ingest-leads?lob=REMITTANCE",
+    "onSuccess": {
+      "reloadPage": true,
+      "closeDrawer": true,
+      "showNotification": true
+    },
+    "errorMessage": "Upload failed. Check the CSV has a header row, a user_id column, and a cohort column.",
+    "forceMultipart": true,
+    "successMessage": "Pool loaded. Then Dispatch Leads."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+      "file"
+    ],
+    "properties": {
+      "file": {}
+    },
+    "errorMessage": {
+      "required": {
+        "file": "Please select a CSV to upload"
+      }
+    }
+  }
+}

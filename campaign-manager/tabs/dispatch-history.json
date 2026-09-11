@@ -1,0 +1,79 @@
+{
+  "body": [
+    {
+      "config": {
+        "id": "rizz-dispatch-history",
+        "title": "Dispatch History",
+        "columns": [
+          {
+            "key": "dispatchedAt",
+            "title": "Run At",
+            "cellType": "timestamp",
+            "sortable": false
+          },
+          {
+            "key": "batchDate",
+            "title": "Batch",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "statedCapacity",
+            "title": "Capacity",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "target",
+            "title": "Target",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "considered",
+            "title": "Considered",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "churnedDispatched",
+            "title": "Churned",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "unactivatedDispatched",
+            "title": "Unactivated",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "totalDispatched",
+            "title": "Total",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "skipped",
+            "title": "Skipped",
+            "cellType": "text",
+            "sortable": false
+          }
+        ],
+        "emptyState": {
+          "title": "No dispatch runs yet",
+          "description": "Dispatch leads to see run history here."
+        },
+        "dataEndpoint": "/pulse-service/api/v1/data/rizz-calling/get-dispatch-runs?lob=REMITTANCE"
+      },
+      "widgetType": "DATA_TABLE",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "rizz-dispatch-tab",
+  "layout": {
+    "mode": "grid",
+    "columns": 1
+  },
+  "schemaVersion": "1.0.0"
+}

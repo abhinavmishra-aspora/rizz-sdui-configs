@@ -1,0 +1,202 @@
+{
+  "body": [
+    {
+      "config": {
+        "id": "rizz-lead-profile",
+        "icon": "user-round-search",
+        "title": "Lead Profile",
+        "sections": [
+          {
+            "id": "rizz-lead-profile-fields",
+            "items": [
+              {
+                "type": "badge",
+                "label": "Cohort",
+                "value": "$fn:getOrDefault($leadContext.cohort, '-')",
+                "variant": "$fn:statusVariant($leadContext.cohort)"
+              },
+              {
+                "type": "badge",
+                "label": "Segment",
+                "value": "$fn:humanize($fn:getOrDefault($leadContext.businessSegment, '-'))",
+                "variant": "$fn:statusVariant($leadContext.businessSegment)"
+              },
+              {
+                "type": "badge",
+                "label": "Call Type",
+                "value": "$fn:humanize($fn:getOrDefault($leadContext.callType, '-'))",
+                "variant": "$fn:statusVariant($leadContext.callType)"
+              },
+              {
+                "type": "badge",
+                "label": "KYC Status",
+                "value": "$fn:humanize($fn:getOrDefault($leadContext.kycStatus, '-'))",
+                "variant": "$fn:statusVariant($leadContext.kycStatus)"
+              },
+              {
+                "type": "text",
+                "label": "Corridor",
+                "value": "$fn:getOrDefault($leadContext.corridor, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Signup Date",
+                "value": "$fn:formatDate($leadContext.signupDate)"
+              },
+              {
+                "type": "text",
+                "label": "Last Transaction",
+                "value": "$fn:formatDate($leadContext.lastTransactionAt)"
+              },
+              {
+                "type": "text",
+                "label": "Total Transfers",
+                "value": "$fn:getOrDefault($leadContext.totalTransfers, '-')"
+              },
+              {
+                "type": "text",
+                "label": "TPV USD (churned only)",
+                "value": "$fn:getOrDefault($leadContext.tpv, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Attempt",
+                "value": "$fn:getOrDefault($leadContext.attemptNo, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Cycle",
+                "value": "$fn:getOrDefault($leadContext.cycleNo, '-')"
+              },
+              {
+                "type": "text",
+                "label": "User ID",
+                "value": "$fn:getOrDefault($leadContext.userId, '-')",
+                "copyable": true
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-lead-pitch",
+        "icon": "megaphone",
+        "title": "Pitch & Benefits (inform only — do not assign new offers)",
+        "sections": [
+          {
+            "id": "rizz-lead-pitch-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Free Transfers Available",
+                "value": "$fn:getOrDefault($leadContext.freeTransfersAvailable, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Aspora Cash Balance",
+                "value": "$fn:getOrDefault($leadContext.asporaCashAvailable, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Last Attempt Disposition",
+                "value": "$fn:humanize($fn:getOrDefault($leadContext.lastDisposition, '-'))"
+              },
+              {
+                "type": "text",
+                "label": "Requested Callback Time",
+                "value": "$fn:formatDate($leadContext.scheduledTime)"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-lead-talking-points",
+        "icon": "list-checks",
+        "title": "Why We're Calling (talking points)",
+        "sections": [
+          {
+            "id": "rizz-lead-talking-points-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Talking Points",
+                "value": "$fn:getOrDefault($leadContext.heroMessages, '-')"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 1
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-lead-history",
+        "icon": "message-square",
+        "title": "Past Conversations (newest first)",
+        "sections": [
+          {
+            "id": "rizz-lead-history-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Conversation History",
+                "value": "$fn:getOrDefault($leadContext.pastConversationSummary, 'No previous attempts.')"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 1
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "lead_context",
+  "layout": {
+    "mode": "vertical"
+  },
+  "dataSource": {
+    "ticket": {
+      "params": {
+        "ticketId": "{ticketId}"
+      },
+      "provider": "ticket"
+    },
+    "leadContext": {
+      "client": "rizz-calling",
+      "params": {
+        "attemptId": "$ticket.metadata.currentAttemptRef"
+      },
+      "endpoint": "get-context",
+      "dependsOn": [
+        "ticket"
+      ]
+    }
+  },
+  "schemaVersion": "1.0.0"
+}

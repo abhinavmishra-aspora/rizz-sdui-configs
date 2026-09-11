@@ -1,0 +1,132 @@
+{
+  "id": "rizz-call-notanswered-form",
+  "title": "Not Answered",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "icon": "x-circle",
+      "label": "Submit",
+      "variant": "destructive",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "notanswered-section",
+      "type": "fieldset",
+      "fields": [
+        {
+          "id": "disposition",
+          "name": "disposition",
+          "type": "singleSelect",
+          "label": "Disposition",
+          "options": [
+            {
+              "label": "Not Answered - No Pickup",
+              "value": "NOT_ANSWERED_NO_PICKUP"
+            },
+            {
+              "label": "Not Answered - Busy",
+              "value": "NOT_ANSWERED_BUSY"
+            },
+            {
+              "label": "Not Answered - Switched Off",
+              "value": "NOT_ANSWERED_SWITCHED_OFF"
+            },
+            {
+              "label": "Not Answered - Invalid Number",
+              "value": "NOT_ANSWERED_INVALID_NUMBER"
+            }
+          ],
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 12
+          }
+        },
+        {
+          "id": "notes",
+          "name": "notes",
+          "rows": 4,
+          "type": "textarea",
+          "label": "Notes",
+          "maxLength": 1000,
+          "isRequired": false,
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "placeholder": "Add notes about the call..."
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "description": "Lead did not pick up. Capture why. No callback calendar. Posts disposition to Rizz and marks the ticket failed (Rizz re-dispatches the retry).",
+  "submitConfig": {
+    "client": "rizz-calling",
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/forms/rizz-call-notanswered-form/submit",
+    "onSuccess": {
+      "closeDrawer": true,
+      "showNotification": true
+    },
+    "pathParams": {
+      "currentAttemptRef": "$params.currentAttemptRef"
+    },
+    "operationId": "submit-feedback",
+    "postActions": [
+      {
+        "type": "transitionSubstatus",
+        "action": "FAIL"
+      }
+    ],
+    "bodyTemplate": {
+      "notes": "$formData.notes",
+      "disposition": "$formData.disposition"
+    },
+    "errorMessage": "Failed to submit feedback. Please try again.",
+    "successMessage": "Feedback submitted."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+      "disposition"
+    ],
+    "properties": {
+      "notes": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "disposition": {
+        "enum": [
+          "NOT_ANSWERED_NO_PICKUP",
+          "NOT_ANSWERED_BUSY",
+          "NOT_ANSWERED_SWITCHED_OFF",
+          "NOT_ANSWERED_INVALID_NUMBER"
+        ],
+        "type": "string"
+      }
+    },
+    "errorMessage": {
+      "required": {
+        "disposition": "Please select a disposition"
+      }
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "id": "rizz-cancel-remaining-form",
+  "title": "Cancel all remaining tickets",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Go Back",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "icon": "alert-triangle",
+      "label": "Cancel all remaining",
+      "variant": "destructive",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "cancel-section",
+      "type": "fieldset",
+      "title": "Reason for cancellation",
+      "fields": [
+        {
+          "id": "lob",
+          "name": "lob",
+          "type": "singleSelect",
+          "label": "Line of Business",
+          "options": [
+            {
+              "label": "Remittance",
+              "value": "REMITTANCE"
+            },
+            {
+              "label": "Banking",
+              "value": "BANKING"
+            }
+          ],
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "REMITTANCE"
+        },
+        {
+          "id": "reason",
+          "name": "reason",
+          "type": "singleSelect",
+          "label": "Reason",
+          "options": [
+            {
+              "label": "Campaign ended / day closed",
+              "value": "CAMPAIGN_ENDED"
+            },
+            {
+              "label": "Wrong pool uploaded",
+              "value": "WRONG_POOL"
+            },
+            {
+              "label": "Data quality issue in the pool",
+              "value": "DATA_ISSUE"
+            },
+            {
+              "label": "Duplicate or accidental dispatch",
+              "value": "DUPLICATE_DISPATCH"
+            },
+            {
+              "label": "Operational pause",
+              "value": "OPERATIONAL_PAUSE"
+            },
+            {
+              "label": "Other (specify below)",
+              "value": "OTHER"
+            }
+          ],
+          "helpText": "Recorded on the audit log and on every released lead.",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 6
+          }
+        },
+        {
+          "id": "otherText",
+          "name": "otherText",
+          "type": "textarea",
+          "label": "If Other, specify",
+          "helpText": "Required only if you picked Other.",
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "placeholder": "Only needed when reason is Other"
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "description": "Cancels EVERY still-open ticket in this queue and releases those leads back to Rizz (no attempt charged). This can't be undone — pick a reason so it's recorded in the audit log.",
+  "submitConfig": {
+    "client": "rizz-calling",
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/forms/rizz-cancel-remaining-form/submit",
+    "onSuccess": {
+      "closeDrawer": true,
+      "refreshPage": true,
+      "showNotification": true
+    },
+    "operationId": "cancel-remaining",
+    "bodyTemplate": {
+      "lob": "$formData.lob",
+      "reason": "$formData.reason",
+      "otherText": "$formData.otherText"
+    },
+    "confirmation": {
+      "title": "Cancel all remaining tickets?",
+      "message": "This cancels every open ticket in the queue and can't be undone.",
+      "cancelLabel": "Go Back",
+      "confirmLabel": "Cancel all"
+    },
+    "errorMessage": "Failed to cancel remaining tickets.",
+    "successMessage": "All remaining tickets cancelled and leads released."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+      "lob",
+      "reason"
+    ],
+    "properties": {
+      "lob": {},
+      "reason": {},
+      "otherText": {
+        "type": "string"
+      }
+    },
+    "errorMessage": {
+      "required": {
+        "lob": "Choose a line of business",
+        "reason": "A cancellation reason is required"
+      }
+    }
+  }
+}

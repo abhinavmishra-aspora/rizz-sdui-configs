@@ -1,0 +1,710 @@
+{
+  "body": [
+    {
+      "config": {
+        "useClientRoute": true
+      },
+      "widgetType": "BREADCRUMB",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "title": "Campaign Calling Queue",
+        "actions": [
+          {
+            "id": "cancel_remaining",
+            "icon": "x-octagon",
+            "label": "Cancel remaining",
+            "variant": "destructive",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-cancel-remaining-form?entityType=ticket&categoryId=$categoryId",
+            "actionType": "openDrawer",
+            "requiredPermissions": [
+              "rizz-calling:ticket:cancel",
+              "rizz-calling:ticket:*",
+              "rizz-calling:*"
+            ]
+          },
+          {
+            "id": "start_shift",
+            "icon": "play",
+            "label": "Start shift",
+            "method": "POST",
+            "variant": "success",
+            "endpoint": "/pulse-service/api/v1/routing/shift/start",
+            "actionType": "apiCall",
+            "requestBody": {
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:contains($shiftStatus.availableActions, 'start_shift')",
+            "successMessage": "Shift started"
+          },
+          {
+            "id": "pause_new_tickets",
+            "icon": "pause",
+            "label": "Pause new tickets",
+            "method": "POST",
+            "variant": "outline",
+            "endpoint": "/pulse-service/api/v1/routing/shift/go-away",
+            "actionType": "apiCall",
+            "requestBody": {
+              "mode": "PAUSE",
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:contains($shiftStatus.availableActions, 'pause_new_tickets')",
+            "successMessage": "Paused for new tickets"
+          },
+          {
+            "id": "go_on_break",
+            "icon": "coffee",
+            "label": "Go on break",
+            "method": "POST",
+            "confirm": {
+              "icon": "coffee",
+              "title": "Go on Break",
+              "actions": [
+                {
+                  "id": "cancel_break",
+                  "label": "Cancel",
+                  "variant": "outline",
+                  "actionType": "closeConfirmationDialog"
+                },
+                {
+                  "id": "confirm_break",
+                  "label": "Pause & go on break",
+                  "method": "POST",
+                  "variant": "default",
+                  "endpoint": "/pulse-service/api/v1/routing/shift/go-away",
+                  "actionType": "apiCall",
+                  "requestBody": {
+                    "mode": "BREAK",
+                    "categoryId": "$categoryId"
+                  },
+                  "successMessage": "Break started"
+                }
+              ],
+              "message": "$fn:shiftBlockerMessage($shiftStatus.blockingTickets, 'break')"
+            },
+            "variant": "outline",
+            "endpoint": "/pulse-service/api/v1/routing/shift/go-away",
+            "actionType": "apiCall",
+            "requestBody": {
+              "mode": "BREAK",
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:contains($shiftStatus.availableActions, 'go_on_break')",
+            "successMessage": "Break started"
+          },
+          {
+            "id": "resume_new_tickets",
+            "icon": "play-circle",
+            "label": "Resume new tickets",
+            "method": "POST",
+            "variant": "success",
+            "endpoint": "/pulse-service/api/v1/routing/shift/resume",
+            "actionType": "apiCall",
+            "requestBody": {
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:contains($shiftStatus.availableActions, 'resume_new_tickets')",
+            "successMessage": "Resumed receiving new tickets"
+          },
+          {
+            "id": "confirm_away",
+            "icon": "check-circle",
+            "label": "Complete away",
+            "method": "POST",
+            "variant": "default",
+            "endpoint": "/pulse-service/api/v1/routing/shift/confirm-away",
+            "actionType": "apiCall",
+            "requestBody": {
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:contains($shiftStatus.availableActions, 'confirm_away')",
+            "successMessage": "Away transition completed"
+          },
+          {
+            "id": "logoff_blocked",
+            "icon": "log-out",
+            "label": "Log off",
+            "method": "POST",
+            "confirm": {
+              "icon": "log-out",
+              "title": "Cannot Log Off",
+              "actions": [
+                {
+                  "id": "close_logoff_blocked",
+                  "label": "Close",
+                  "variant": "outline",
+                  "actionType": "closeConfirmationDialog"
+                }
+              ],
+              "message": "$fn:shiftBlockerMessage($shiftStatus.blockingTickets, 'logoff')"
+            },
+            "variant": "destructive",
+            "endpoint": "/pulse-service/api/v1/routing/shift/go-away",
+            "actionType": "apiCall",
+            "requestBody": {
+              "mode": "LOGOFF",
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:hasLogoffBlockers($shiftStatus)"
+          },
+          {
+            "id": "logoff",
+            "icon": "log-out",
+            "label": "Log off",
+            "method": "POST",
+            "confirm": {
+              "icon": "log-out",
+              "title": "Log Off",
+              "actions": [
+                {
+                  "id": "cancel_logoff",
+                  "label": "Cancel",
+                  "variant": "outline",
+                  "actionType": "closeConfirmationDialog"
+                },
+                {
+                  "id": "confirm_logoff",
+                  "label": "Log off",
+                  "method": "POST",
+                  "variant": "destructive",
+                  "endpoint": "/pulse-service/api/v1/routing/shift/go-away",
+                  "actionType": "apiCall",
+                  "requestBody": {
+                    "mode": "LOGOFF",
+                    "categoryId": "$categoryId"
+                  },
+                  "successMessage": "Logged off"
+                }
+              ],
+              "message": "$fn:shiftBlockerMessage($shiftStatus.blockingTickets, 'logoff')"
+            },
+            "variant": "destructive",
+            "endpoint": "/pulse-service/api/v1/routing/shift/go-away",
+            "actionType": "apiCall",
+            "requestBody": {
+              "mode": "LOGOFF",
+              "categoryId": "$categoryId"
+            },
+            "visibleWhen": "$fn:canConfirmLogoff($shiftStatus)",
+            "successMessage": "Logged off"
+          }
+        ],
+        "subtitle": "Outbound calls to churned & unactivated users — inform existing benefits, drive transactions",
+        "statusPills": [
+          {
+            "label": "Shift",
+            "value": "Paused for new tickets",
+            "variant": "warning",
+            "visibleWhen": {
+              "field": "$shiftStatus.shiftState",
+              "value": "DRAINING",
+              "operator": "eq"
+            }
+          }
+        ]
+      },
+      "widgetType": "ENTITY_HEADER",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "items": [
+          {
+            "title": "Pending",
+            "value": "$stats.pending",
+            "variant": "info"
+          },
+          {
+            "title": "Scheduled Callbacks",
+            "value": "$stats.scheduledCallbacks",
+            "variant": "error"
+          },
+          {
+            "title": "Unassigned",
+            "value": "$stats.unassigned",
+            "variant": "default"
+          },
+          {
+            "title": "In Progress",
+            "value": "$stats.inProgress",
+            "variant": "default"
+          },
+          {
+            "title": "SLA at Risk",
+            "value": "$stats.slaAtRisk",
+            "variant": "warning"
+          }
+        ]
+      },
+      "widgetType": "STATS",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "sort": {
+          "icon": "arrow-up-down",
+          "label": "Sort by",
+          "enabled": true,
+          "options": [
+            {
+              "id": "sla_risk",
+              "label": "SLA Risk",
+              "subOptions": [
+                {
+                  "id": "sla_desc",
+                  "label": "SLA risk (soonest first)",
+                  "value": "slaTimeRemainingSeconds:asc"
+                },
+                {
+                  "id": "sla_asc",
+                  "label": "SLA risk (most time left)",
+                  "value": "slaTimeRemainingSeconds:desc"
+                }
+              ]
+            },
+            {
+              "id": "created_at",
+              "label": "Created At",
+              "subOptions": [
+                {
+                  "id": "created_desc",
+                  "label": "Newest first",
+                  "value": "createdAt:desc"
+                },
+                {
+                  "id": "created_asc",
+                  "label": "Dispatch order (rank)",
+                  "value": "createdAt:asc"
+                }
+              ]
+            },
+            {
+              "id": "callback_time",
+              "label": "Callback Time",
+              "subOptions": [
+                {
+                  "id": "cb_asc",
+                  "label": "Callback soonest first",
+                  "value": "slot:asc"
+                }
+              ]
+            }
+          ]
+        },
+        "search": {
+          "endpoint": "/pulse-service/api/v1/tickets/category/$categoryId",
+          "searchKeys": [
+            {
+              "label": "User ID",
+              "value": "customerId"
+            },
+            {
+              "label": "Ticket ID",
+              "value": "id"
+            },
+            {
+              "label": "Attempt Ref",
+              "value": "entityId"
+            }
+          ],
+          "placeholder": "Search by ticket ID, user ID, attempt ref..."
+        },
+        "actions": [
+          {
+            "id": "refresh",
+            "icon": "refresh-cw",
+            "label": "Refresh",
+            "method": "GET",
+            "variant": "outline",
+            "endpoint": "/pulse-service/api/v1/tickets/category/$categoryId",
+            "actionType": "apiCall"
+          }
+        ],
+        "filters": [
+          {
+            "key": "priority",
+            "type": "multiSelect",
+            "label": "Priority",
+            "options": [
+              {
+                "label": "Urgent (scheduled callback)",
+                "value": "URGENT"
+              },
+              {
+                "label": "High (retry / reminder)",
+                "value": "HIGH"
+              },
+              {
+                "label": "Medium (fresh)",
+                "value": "MEDIUM"
+              }
+            ],
+            "variant": "destructured"
+          },
+          {
+            "key": "status",
+            "type": "multiSelect",
+            "label": "Status",
+            "options": [
+              {
+                "label": "Created",
+                "value": "CREATED"
+              },
+              {
+                "label": "Unassigned",
+                "value": "UNASSIGNED"
+              },
+              {
+                "label": "Assigned",
+                "value": "ASSIGNED"
+              },
+              {
+                "label": "In Progress",
+                "value": "IN_PROGRESS"
+              },
+              {
+                "label": "Closed",
+                "value": "CLOSED"
+              }
+            ],
+            "variant": "destructured"
+          },
+          {
+            "key": "substatus",
+            "type": "multiSelect",
+            "label": "Substatus",
+            "options": [
+              {
+                "label": "Requested",
+                "value": "REQUESTED"
+              },
+              {
+                "label": "Assigned",
+                "value": "ASSIGNED"
+              },
+              {
+                "label": "On Call",
+                "value": "ON_CALL"
+              },
+              {
+                "label": "Resolved",
+                "value": "RESOLVED"
+              },
+              {
+                "label": "Cancelled",
+                "value": "CANCELLED"
+              },
+              {
+                "label": "Failed",
+                "value": "FAILED"
+              },
+              {
+                "label": "Rejected",
+                "value": "REJECTED"
+              },
+              {
+                "label": "Expired",
+                "value": "EXPIRED"
+              }
+            ],
+            "variant": "destructured"
+          },
+          {
+            "key": "slaStatus",
+            "type": "multiSelect",
+            "label": "SLA",
+            "options": [
+              {
+                "label": "On Track",
+                "value": "ON_TRACK"
+              },
+              {
+                "label": "At Risk",
+                "value": "AT_RISK"
+              },
+              {
+                "label": "Breached",
+                "value": "BREACHED"
+              }
+            ],
+            "variant": "destructured"
+          },
+          {
+            "key": "assigneeId",
+            "type": "singleSelect",
+            "label": "Assignment",
+            "options": [
+              {
+                "label": "All",
+                "value": "ALL"
+              },
+              {
+                "label": "My Tickets",
+                "value": "MINE"
+              },
+              {
+                "label": "Unassigned",
+                "value": "UNASSIGNED"
+              }
+            ],
+            "variant": "destructured"
+          }
+        ]
+      },
+      "widgetType": "FILTER_BAR",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "columns": [
+          {
+            "key": "id",
+            "title": "Ticket ID",
+            "cellType": "id",
+            "sortable": true
+          },
+          {
+            "key": "entityId",
+            "title": "Attempt Ref",
+            "cellType": "id",
+            "sortable": false
+          },
+          {
+            "key": "customerId",
+            "title": "User ID",
+            "cellType": "id",
+            "sortable": false
+          },
+          {
+            "key": "businessReference",
+            "title": "Cohort",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "priority",
+            "title": "Priority",
+            "options": [
+              {
+                "label": "Urgent",
+                "value": "URGENT",
+                "variant": "destructive"
+              },
+              {
+                "label": "High",
+                "value": "HIGH",
+                "variant": "warning"
+              },
+              {
+                "label": "Medium",
+                "value": "MEDIUM",
+                "variant": "default"
+              },
+              {
+                "label": "Low",
+                "value": "LOW",
+                "variant": "secondary"
+              }
+            ],
+            "cellType": "badge",
+            "sortable": true
+          },
+          {
+            "key": "assigneeEmail",
+            "title": "Assigned To",
+            "cellType": "text",
+            "sortable": false
+          },
+          {
+            "key": "substatus",
+            "title": "Substatus",
+            "options": [
+              {
+                "label": "Requested",
+                "value": "REQUESTED",
+                "variant": "secondary"
+              },
+              {
+                "label": "Assigned",
+                "value": "ASSIGNED",
+                "variant": "info"
+              },
+              {
+                "label": "On Call",
+                "value": "ON_CALL",
+                "variant": "success"
+              },
+              {
+                "label": "Resolved",
+                "value": "RESOLVED",
+                "variant": "default"
+              },
+              {
+                "label": "Cancelled",
+                "value": "CANCELLED",
+                "variant": "default"
+              },
+              {
+                "label": "Failed",
+                "value": "FAILED",
+                "variant": "destructive"
+              },
+              {
+                "label": "Rejected",
+                "value": "REJECTED",
+                "variant": "destructive"
+              },
+              {
+                "label": "Expired",
+                "value": "EXPIRED",
+                "variant": "warning"
+              }
+            ],
+            "cellType": "badge",
+            "sortable": true
+          },
+          {
+            "key": "createdAt",
+            "title": "Created At",
+            "cellType": "timestamp",
+            "sortable": true
+          },
+          {
+            "key": "slot",
+            "title": "Callback At",
+            "cellType": "timestamp",
+            "sortable": true
+          },
+          {
+            "key": "slaStatus",
+            "title": "SLA Status",
+            "options": [
+              {
+                "label": "On Track",
+                "value": "ON_TRACK",
+                "variant": "success"
+              },
+              {
+                "label": "At Risk",
+                "value": "AT_RISK",
+                "variant": "warning"
+              },
+              {
+                "label": "Breached",
+                "value": "BREACHED",
+                "variant": "destructive"
+              }
+            ],
+            "cellType": "badge",
+            "sortable": false
+          },
+          {
+            "key": "status",
+            "title": "Status",
+            "options": [
+              {
+                "label": "Created",
+                "value": "CREATED",
+                "variant": "secondary"
+              },
+              {
+                "label": "Unassigned",
+                "value": "UNASSIGNED",
+                "variant": "warning"
+              },
+              {
+                "label": "Assigned",
+                "value": "ASSIGNED",
+                "variant": "info"
+              },
+              {
+                "label": "In Progress",
+                "value": "IN_PROGRESS",
+                "variant": "success"
+              },
+              {
+                "label": "Closed",
+                "value": "CLOSED",
+                "variant": "default"
+              }
+            ],
+            "cellType": "badge",
+            "sortable": true
+          },
+          {
+            "key": "actions",
+            "align": "right",
+            "title": "Actions",
+            "sticky": "right",
+            "actions": [
+              {
+                "id": "assignToMe",
+                "icon": "user-check",
+                "label": "Assign to Me",
+                "method": "POST",
+                "variant": "success",
+                "endpoint": "/pulse-service/api/v1/tickets/{id}/claim",
+                "onFailure": {
+                  "target": "/tickets/rizz-calling/{id}",
+                  "actionType": "navigate"
+                },
+                "onSuccess": {
+                  "target": "/tickets/rizz-calling/{id}",
+                  "actionType": "navigate"
+                },
+                "actionType": "apiCall",
+                "errorMessage": "Failed to claim ticket.",
+                "successMessage": "Ticket claimed successfully!",
+                "validationSchema": {
+                  "type": "object",
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "CREATED",
+                        "UNASSIGNED"
+                      ]
+                    }
+                  }
+                }
+              }
+            ],
+            "cellType": "actionsMenu",
+            "sortable": false
+          }
+        ],
+        "dataEndpoint": "/pulse-service/api/v1/tickets/category/$categoryId",
+        "rowClickAction": {
+          "target": "/tickets/rizz-calling/{id}",
+          "actionType": "navigate"
+        }
+      },
+      "widgetType": "DATA_TABLE",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "footer": null,
+  "header": null,
+  "pageId": "rizz-calling-queue",
+  "dataSource": {
+    "stats": {
+      "params": {
+        "categoryId": "{categoryId}"
+      },
+      "provider": "categoryQueueStats"
+    },
+    "shiftStatus": {
+      "params": {
+        "categoryId": "{categoryId}"
+      },
+      "provider": "agentShiftStatus"
+    }
+  },
+  "isEntityPage": true,
+  "schemaVersion": "1.0.0"
+}

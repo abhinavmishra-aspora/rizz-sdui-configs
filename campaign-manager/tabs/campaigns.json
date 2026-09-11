@@ -1,0 +1,68 @@
+{
+  "body": [
+    {
+      "config": {
+        "id": "rizz-campaigns",
+        "title": "Campaigns",
+        "columns": [
+          {
+            "key": "campaignId",
+            "title": "Campaign ID",
+            "cellType": "id",
+            "filterable": true
+          },
+          {
+            "key": "lob",
+            "title": "LOB",
+            "cellType": "badge",
+            "filterable": true
+          },
+          {
+            "key": "status",
+            "title": "Status",
+            "cellType": "badge",
+            "filterable": true
+          },
+          {
+            "key": "name",
+            "title": "Name",
+            "cellType": "text"
+          },
+          {
+            "key": "dailyCapacity",
+            "title": "Daily Capacity",
+            "cellType": "text"
+          },
+          {
+            "key": "poolLimit",
+            "title": "Pool / Cohort",
+            "cellType": "text"
+          },
+          {
+            "key": "regions",
+            "title": "Regions",
+            "cellType": "text"
+          },
+          {
+            "key": "updatedAt",
+            "title": "Last Updated",
+            "cellType": "timestamp"
+          }
+        ],
+        "emptyState": {
+          "title": "No campaigns yet",
+          "description": "Create a campaign from the Configure drawer."
+        },
+        "dataEndpoint": "/pulse-service/api/v1/data/rizz-calling/list-campaigns"
+      },
+      "widgetType": "DATA_TABLE",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "rizz-campaigns-tab",
+  "layout": {
+    "mode": "grid",
+    "columns": 1
+  },
+  "schemaVersion": "1.0.0"
+}

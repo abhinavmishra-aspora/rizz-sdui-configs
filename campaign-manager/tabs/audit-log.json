@@ -1,0 +1,59 @@
+{
+  "body": [
+    {
+      "config": {
+        "id": "rizz-campaign-audit",
+        "title": "Audit Log & Config History",
+        "columns": [
+          {
+            "key": "occurredAt",
+            "title": "When",
+            "cellType": "timestamp",
+            "sortable": true
+          },
+          {
+            "key": "action",
+            "title": "Action",
+            "cellType": "badge",
+            "filterable": true
+          },
+          {
+            "key": "campaignId",
+            "title": "Campaign",
+            "cellType": "id",
+            "filterable": true
+          },
+          {
+            "key": "lob",
+            "title": "LOB",
+            "cellType": "badge",
+            "filterable": true
+          },
+          {
+            "key": "change",
+            "title": "Change",
+            "cellType": "text"
+          },
+          {
+            "key": "actor",
+            "title": "By",
+            "cellType": "text"
+          }
+        ],
+        "emptyState": {
+          "title": "No activity yet",
+          "description": "Config changes and actions will appear here."
+        },
+        "dataEndpoint": "/pulse-service/api/v1/data/rizz-calling/get-campaign-audit?limit=100"
+      },
+      "widgetType": "DATA_TABLE",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "rizz-audit-tab",
+  "layout": {
+    "mode": "grid",
+    "columns": 1
+  },
+  "schemaVersion": "1.0.0"
+}

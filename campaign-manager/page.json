@@ -1,0 +1,291 @@
+{
+  "body": [
+    {
+      "config": {
+        "useClientRoute": true
+      },
+      "widgetType": "BREADCRUMB",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "title": "Campaign Calling",
+        "actions": [
+          {
+            "id": "upload-leads",
+            "icon": "upload",
+            "label": "Upload Leads",
+            "variant": "primary",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-upload-leads-form",
+            "actionType": "openDrawer",
+            "requiredPermissions": [
+              "remittance:campaign:manage",
+              "rizz-calling:campaign:write",
+              "rizz-calling:campaign:*",
+              "rizz-calling:*"
+            ]
+          },
+          {
+            "id": "dispatch-leads",
+            "icon": "send",
+            "label": "Dispatch Leads",
+            "method": "POST",
+            "confirm": {
+              "title": "Dispatch leads?",
+              "actions": [
+                {
+                  "id": "cancel-dispatch",
+                  "label": "Cancel",
+                  "variant": "outline",
+                  "actionType": "closeConfirmationDialog"
+                },
+                {
+                  "id": "confirm-dispatch",
+                  "label": "Dispatch",
+                  "method": "POST",
+                  "variant": "primary",
+                  "endpoint": "/pulse-service/api/v1/data/rizz-calling/dispatch-leads?lob=REMITTANCE",
+                  "actionType": "apiCall",
+                  "errorMessage": "Dispatch failed.",
+                  "successMessage": "Dispatch started. Open the Rizz Calling queue to see the tickets."
+                }
+              ],
+              "message": "This creates tickets on the Rizz Calling queue from the loaded pool, up to the campaign's dispatch target. Make sure the pool is uploaded."
+            },
+            "variant": "primary",
+            "endpoint": "/pulse-service/api/v1/data/rizz-calling/dispatch-leads?lob=REMITTANCE",
+            "actionType": "apiCall",
+            "errorMessage": "Dispatch failed.",
+            "successMessage": "Dispatch started. Open the Rizz Calling queue to see the tickets.",
+            "requiredPermissions": [
+              "remittance:campaign:manage",
+              "rizz-calling:campaign:write",
+              "rizz-calling:campaign:*",
+              "rizz-calling:*"
+            ]
+          },
+          {
+            "id": "view-rizz-queue",
+            "icon": "external-link",
+            "label": "Campaign Calling Queue",
+            "target": "/tickets/rizz-calling",
+            "variant": "outline",
+            "actionType": "navigate"
+          },
+          {
+            "id": "configure",
+            "icon": "settings",
+            "label": "Configure",
+            "variant": "outline",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-campaign-config-form",
+            "actionType": "openDrawer",
+            "requiredPermissions": [
+              "remittance:campaign:manage",
+              "rizz-calling:campaign:write",
+              "rizz-calling:campaign:*",
+              "rizz-calling:*"
+            ]
+          },
+          {
+            "id": "pool-queries",
+            "icon": "code",
+            "label": "Pool Queries",
+            "variant": "outline",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-pool-queries-form",
+            "actionType": "openDrawer",
+            "requiredPermissions": [
+              "remittance:campaign:manage",
+              "rizz-calling:campaign:write",
+              "rizz-calling:campaign:*",
+              "rizz-calling:*"
+            ]
+          }
+        ],
+        "subtitle": "Configure the proactive-calling campaign and generate the daily lead pool"
+      },
+      "widgetType": "ENTITY_HEADER",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz_campaign_stats",
+        "items": [
+          {
+            "title": "Agents",
+            "value": "$campaign.numAgents",
+            "variant": "default"
+          },
+          {
+            "title": "Tickets / Agent",
+            "value": "$campaign.ticketsPerAgent",
+            "variant": "default"
+          },
+          {
+            "title": "Capacity",
+            "value": "$campaign.capacity",
+            "variant": "info"
+          },
+          {
+            "title": "Overpush",
+            "value": "$campaign.overpushMultiplier",
+            "variant": "warning"
+          },
+          {
+            "title": "Dispatch Target",
+            "value": "$campaign.target",
+            "variant": "success"
+          }
+        ]
+      },
+      "widgetType": "STATS",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-campaign-config-summary",
+        "title": "Current Configuration",
+        "sections": [
+          {
+            "id": "pool-query-params",
+            "items": [
+              {
+                "type": "text",
+                "label": "Churn threshold (days)",
+                "value": "$fn:getOrDefault($campaign.churnDaysThreshold, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Min signup age (days)",
+                "value": "$fn:getOrDefault($campaign.minSignupDays, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Regions",
+                "value": "$fn:getOrDefault($campaign.regions, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Pool size per cohort",
+                "value": "$fn:getOrDefault($campaign.poolLimit, '-')"
+              }
+            ],
+            "title": "Pool query",
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          },
+          {
+            "id": "holdout-lifecycle",
+            "items": [
+              {
+                "type": "text",
+                "label": "Holdout fraction",
+                "value": "$fn:getOrDefault($campaign.holdoutPct, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Max attempts",
+                "value": "$fn:getOrDefault($campaign.lifetimeCeiling, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Retry wait (days)",
+                "value": "$fn:getOrDefault($campaign.retryWaitDays, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Cooldown (days)",
+                "value": "$fn:getOrDefault($campaign.cooldownDays, '-')"
+              }
+            ],
+            "title": "Holdout & lifecycle",
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          },
+          {
+            "id": "identity",
+            "items": [
+              {
+                "type": "text",
+                "label": "Campaign ID",
+                "value": "$fn:getOrDefault($campaign.campaignId, '-')",
+                "copyable": true
+              },
+              {
+                "type": "text",
+                "label": "LOB",
+                "value": "$fn:getOrDefault($campaign.lob, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Name",
+                "value": "$fn:getOrDefault($campaign.name, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Last updated",
+                "value": "$fn:getOrDefault($campaign.updatedAt, '-')"
+              }
+            ],
+            "title": "Campaign",
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "tabs": [
+          {
+            "id": "rizz-campaigns-tab",
+            "label": "Campaigns",
+            "isDefault": true
+          },
+          {
+            "id": "rizz-dispatch-tab",
+            "label": "Dispatch History"
+          },
+          {
+            "id": "rizz-audit-tab",
+            "label": "Audit Log"
+          },
+          {
+            "id": "rizz-queries-tab",
+            "label": "Pool Queries"
+          }
+        ],
+        "contentEndpoint": "/pulse-service/api/v1/page/rizz-campaign-manager/REMITTANCE?tab={tabId}"
+      },
+      "widgetType": "TABS",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "header": null,
+  "pageId": "rizz-campaign-manager",
+  "dataSource": {
+    "campaign": {
+      "client": "rizz-calling",
+      "params": {
+        "lob": "REMITTANCE"
+      },
+      "endpoint": "get-campaign-config"
+    },
+    "dispatchRuns": {
+      "client": "rizz-calling",
+      "params": {
+        "lob": "REMITTANCE"
+      },
+      "endpoint": "get-dispatch-runs"
+    }
+  },
+  "isEntityPage": false,
+  "schemaVersion": "1.0.0"
+}

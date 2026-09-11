@@ -1,0 +1,233 @@
+{
+  "body": [
+    {
+      "config": {
+        "id": "rizz-customer-identity",
+        "icon": "user",
+        "title": "Customer (who you're calling)",
+        "sections": [
+          {
+            "id": "identity-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Full Name",
+                "value": "$fn:getOrDefault($alphaDeskUser.full_name, '-')"
+              },
+              {
+                "type": "text",
+                "label": "KYC Name",
+                "value": "$fn:getOrDefault($alphaDeskUser.kyc_name, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Mobile Number",
+                "value": "$fn:concat($fn:getOrDefault($alphaDeskUser.code, ''), ' ', $fn:getOrDefault($alphaDeskUser.phone_no, '-'))",
+                "copyable": true
+              },
+              {
+                "type": "text",
+                "label": "Email",
+                "value": "$fn:getOrDefault($alphaDeskUser.email, '-')",
+                "copyable": true
+              },
+              {
+                "type": "text",
+                "label": "Country",
+                "value": "$fn:getOrDefault($alphaDeskUser.country, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Nationality",
+                "value": "$fn:humanize($fn:getOrDefault($alphaDeskUser.nationality, '-'))"
+              },
+              {
+                "type": "badge",
+                "label": "Status",
+                "value": "$fn:getOrDefault($alphaDeskUser.status, '-')",
+                "variant": "$fn:statusVariant($alphaDeskUser.status)"
+              },
+              {
+                "type": "text",
+                "label": "User ID",
+                "value": "$fn:getOrDefault($ticket.customerId, '-')",
+                "copyable": true
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-customer-benefits",
+        "icon": "gift",
+        "title": "Existing Benefits (inform only — do not assign new offers)",
+        "sections": [
+          {
+            "id": "benefits-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Free Transfers Left",
+                "value": "$fn:getOrDefault($freeTransfers.free_transfers_left, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Lifetime Free Transfers",
+                "value": "$fn:getOrDefault($freeTransfers.lifetime_free_transfers, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Aspora Cash",
+                "value": "$fn:getOrDefault($cashWallet.balance, '0')"
+              },
+              {
+                "type": "text",
+                "label": "Aspora Coins",
+                "value": "$fn:getOrDefault($coinsWallet.balance, '0')"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-customer-account",
+        "icon": "smartphone",
+        "title": "Account & App",
+        "sections": [
+          {
+            "id": "account-fields",
+            "items": [
+              {
+                "type": "text",
+                "label": "Created On",
+                "value": "$fn:formatDate($alphaDeskUser.created_at)"
+              },
+              {
+                "type": "text",
+                "label": "Last Updated",
+                "value": "$fn:formatDate($alphaDeskUser.updated_at)"
+              },
+              {
+                "type": "badge",
+                "label": "Phone Verified",
+                "value": "$fn:getOrDefault($alphaDeskUser.phone_verified, '-')",
+                "variant": "$fn:statusVariant($alphaDeskUser.phone_verified)"
+              },
+              {
+                "type": "badge",
+                "label": "Email Verified",
+                "value": "$fn:getOrDefault($alphaDeskUser.email_verified, '-')",
+                "variant": "$fn:statusVariant($alphaDeskUser.email_verified)"
+              },
+              {
+                "type": "text",
+                "label": "App Platform",
+                "value": "$fn:humanize($fn:getOrDefault($device.app_platform, '-'))"
+              },
+              {
+                "type": "text",
+                "label": "App Version",
+                "value": "$fn:getOrDefault($device.app_version_name, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Device Model",
+                "value": "$fn:getOrDefault($device.device_model, '-')"
+              },
+              {
+                "type": "text",
+                "label": "Last Login At",
+                "value": "$fn:formatDate($device.last_login_at)"
+              }
+            ],
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "customer_profile",
+  "layout": {
+    "mode": "vertical"
+  },
+  "dataSource": {
+    "device": {
+      "params": {
+        "userId": "$ticket.customerId"
+      },
+      "provider": "userVaultDevice",
+      "dependsOn": [
+        "ticket"
+      ]
+    },
+    "ticket": {
+      "params": {
+        "ticketId": "{ticketId}"
+      },
+      "provider": "ticket"
+    },
+    "cashWallet": {
+      "client": "rewards-v2",
+      "params": {
+        "user_id": "$ticket.customerId",
+        "walletType": "CASH"
+      },
+      "endpoint": "get-wallet",
+      "dependsOn": [
+        "ticket"
+      ]
+    },
+    "coinsWallet": {
+      "client": "rewards-v2",
+      "params": {
+        "user_id": "$ticket.customerId",
+        "walletType": "COINS"
+      },
+      "endpoint": "get-wallet",
+      "dependsOn": [
+        "ticket"
+      ]
+    },
+    "alphaDeskUser": {
+      "params": {
+        "userId": "$ticket.customerId"
+      },
+      "provider": "alphaDeskUser",
+      "dependsOn": [
+        "ticket"
+      ]
+    },
+    "freeTransfers": {
+      "client": "app-server",
+      "params": {
+        "user_id": "$ticket.customerId"
+      },
+      "endpoint": "get-free-transfers",
+      "dependsOn": [
+        "ticket"
+      ]
+    }
+  },
+  "schemaVersion": "1.0.0"
+}

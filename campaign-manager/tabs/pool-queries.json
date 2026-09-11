@@ -1,0 +1,110 @@
+{
+  "body": [
+    {
+      "config": {
+        "title": "Pool Query",
+        "actions": [
+          {
+            "id": "edit-pool-query",
+            "icon": "settings",
+            "label": "Edit Config",
+            "variant": "primary",
+            "endpoint": "/pulse-service/api/v1/forms/rizz-pool-queries-form",
+            "actionType": "openDrawer",
+            "requiredPermissions": [
+              "remittance:campaign:manage",
+              "rizz-calling:campaign:write",
+              "rizz-calling:campaign:*",
+              "rizz-calling:*"
+            ]
+          },
+          {
+            "id": "open-metabase",
+            "icon": "external-link",
+            "label": "Open in Metabase",
+            "target": "https://metabase.internal.aspora.com/question#eyJkYXRhc2V0X3F1ZXJ5Ijp7ImRhdGFiYXNlIjozLCJsaWIvdHlwZSI6Im1icWwvcXVlcnkiLCJzdGFnZXMiOlt7ImxpYi90eXBlIjoibWJxbC5zdGFnZS9uYXRpdmUiLCJuYXRpdmUiOiIiLCJ0ZW1wbGF0ZS10YWdzIjp7fX1dfSwiZGlzcGxheSI6InRhYmxlIiwicGFyYW1ldGVycyI6W10sInR5cGUiOiJxdWVzdGlvbiIsInZpc3VhbGl6YXRpb25fc2V0dGluZ3MiOnt9fQ==",
+            "variant": "outline",
+            "navTarget": "_blank",
+            "actionType": "navigate"
+          }
+        ],
+        "subtitle": "One combined query for both cohorts (each row self-labeled by cohort). The parameters below come from the campaign config; edit them with the button. Run it in Databricks → one CSV → Upload Leads."
+      },
+      "widgetType": "ENTITY_HEADER",
+      "schemaVersion": "1.0.0"
+    },
+    {
+      "config": {
+        "id": "rizz-combined-query-card",
+        "icon": "code",
+        "title": "Combined pool query",
+        "sections": [
+          {
+            "id": "combined-params",
+            "items": [
+              {
+                "type": "text",
+                "label": "Churn threshold (days) — {{CHURN_DAYS_THRESHOLD}}",
+                "value": "$fn:getOrDefault($combined.churnDaysThreshold,'-')"
+              },
+              {
+                "type": "text",
+                "label": "Min signup age (days) — {{MIN_SIGNUP_DAYS}}",
+                "value": "$fn:getOrDefault($combined.minSignupDays,'-')"
+              },
+              {
+                "type": "text",
+                "label": "Regions — {{REGIONS}}",
+                "value": "$fn:getOrDefault($combined.regions,'-')"
+              },
+              {
+                "type": "text",
+                "label": "Pool size per cohort — {{POOL_LIMIT}}",
+                "value": "$fn:getOrDefault($combined.poolLimit,'-')"
+              }
+            ],
+            "title": "Configurable parameters",
+            "layout": {
+              "mode": "grid",
+              "columns": 4
+            }
+          },
+          {
+            "id": "combined-sql",
+            "items": [
+              {
+                "type": "code",
+                "label": "SQL",
+                "value": "$fn:getOrDefault($combined.generatedSql,'-')",
+                "height": 260,
+                "language": "sql"
+              }
+            ],
+            "title": "Generated SQL (with current config)",
+            "layout": {
+              "mode": "grid",
+              "columns": 1
+            }
+          }
+        ]
+      },
+      "widgetType": "INFO_CARD",
+      "schemaVersion": "1.0.0"
+    }
+  ],
+  "tabId": "rizz-queries-tab",
+  "layout": {
+    "mode": "grid",
+    "columns": 1
+  },
+  "dataSource": {
+    "combined": {
+      "client": "rizz-calling",
+      "params": {
+        "lob": "REMITTANCE"
+      },
+      "endpoint": "get-combined-query"
+    }
+  },
+  "schemaVersion": "1.0.0"
+}

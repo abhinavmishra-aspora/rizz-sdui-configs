@@ -1,0 +1,366 @@
+{
+  "id": "rizz-campaign-config-form",
+  "title": "Campaign Configuration",
+  "actions": [
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outline",
+      "actionType": "closeDrawer"
+    },
+    {
+      "id": "submit",
+      "icon": "check-circle",
+      "label": "Save Configuration",
+      "variant": "primary",
+      "actionType": "submit"
+    }
+  ],
+  "sections": [
+    {
+      "id": "identity-section",
+      "type": "fieldset",
+      "title": "Campaign",
+      "fields": [
+        {
+          "id": "lob",
+          "name": "lob",
+          "type": "singleSelect",
+          "label": "Line of Business",
+          "options": [
+            {
+              "label": "Remittance",
+              "value": "REMITTANCE"
+            },
+            {
+              "label": "Banking",
+              "value": "BANKING"
+            }
+          ],
+          "helpText": "Saving creates, resumes or updates this LOB's campaign and leaves it active.",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "REMITTANCE"
+        },
+        {
+          "id": "name",
+          "name": "name",
+          "type": "text",
+          "label": "Name",
+          "helpText": "Used when a campaign is created for this LOB; renames it otherwise.",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.name"
+        },
+        {
+          "id": "createNew",
+          "name": "createNew",
+          "type": "checkbox",
+          "label": "Create as a new campaign",
+          "helpText": "On: saves a NEW campaign for this LOB (fresh pool) and makes it active, pausing and keeping the current one. Off: edits the LOB's current campaign in place.",
+          "layoutItem": {
+            "colSpan": 12
+          },
+          "defaultValue": false
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    },
+    {
+      "id": "capacity-section",
+      "type": "fieldset",
+      "title": "Capacity",
+      "fields": [
+        {
+          "id": "numAgents",
+          "min": 1,
+          "name": "numAgents",
+          "type": "number",
+          "label": "Agents",
+          "helpText": "Number of calling agents available.",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 4
+          },
+          "defaultValue": "$campaign.numAgents"
+        },
+        {
+          "id": "ticketsPerAgent",
+          "min": 1,
+          "name": "ticketsPerAgent",
+          "type": "number",
+          "label": "Tickets per agent",
+          "helpText": "Concurrent tickets one agent can hold.",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 4
+          },
+          "defaultValue": "$campaign.ticketsPerAgent"
+        },
+        {
+          "id": "overpushMultiplier",
+          "min": 1,
+          "name": "overpushMultiplier",
+          "step": 0.1,
+          "type": "number",
+          "label": "Overpush multiplier",
+          "helpText": "Target = Capacity x this (e.g. 125 x 1.5 = 188).",
+          "isRequired": true,
+          "layoutItem": {
+            "colSpan": 4
+          },
+          "defaultValue": "$campaign.overpushMultiplier"
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      },
+      "description": "Drives how many leads are dispatched per run."
+    },
+    {
+      "id": "pool-query-section",
+      "type": "fieldset",
+      "title": "Pool query",
+      "fields": [
+        {
+          "id": "churnDaysThreshold",
+          "min": 1,
+          "name": "churnDaysThreshold",
+          "type": "number",
+          "label": "Churn threshold (days)",
+          "helpText": "Churned cohort: days since last transaction.",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.churnDaysThreshold"
+        },
+        {
+          "id": "minSignupDays",
+          "min": 1,
+          "name": "minSignupDays",
+          "type": "number",
+          "label": "Min signup age (days)",
+          "helpText": "Unactivated cohort: days since signup.",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.minSignupDays"
+        },
+        {
+          "id": "regions",
+          "name": "regions",
+          "type": "text",
+          "label": "Regions",
+          "helpText": "Comma-separated region codes.",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "placeholder": "AE,GB",
+          "defaultValue": "$campaign.regions"
+        },
+        {
+          "id": "poolLimit",
+          "min": 1,
+          "name": "poolLimit",
+          "type": "number",
+          "label": "Pool size per cohort",
+          "helpText": "LIMIT applied to each cohort query.",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.poolLimit"
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      },
+      "description": "These values are substituted into the generated Databricks query."
+    },
+    {
+      "id": "holdout-lifecycle-section",
+      "type": "fieldset",
+      "title": "Holdout & lifecycle",
+      "fields": [
+        {
+          "id": "holdoutPct",
+          "max": 1,
+          "min": 0,
+          "name": "holdoutPct",
+          "step": 0.01,
+          "type": "number",
+          "label": "Holdout fraction",
+          "helpText": "0.10 = 10% held out, never called.",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.holdoutPct"
+        },
+        {
+          "id": "lifetimeCeiling",
+          "min": 1,
+          "name": "lifetimeCeiling",
+          "type": "number",
+          "label": "Max attempts",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.lifetimeCeiling"
+        },
+        {
+          "id": "retryWaitDays",
+          "min": 0,
+          "name": "retryWaitDays",
+          "type": "number",
+          "label": "Retry wait (days)",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.retryWaitDays"
+        },
+        {
+          "id": "cooldownDays",
+          "min": 0,
+          "name": "cooldownDays",
+          "type": "number",
+          "label": "Cooldown (days)",
+          "layoutItem": {
+            "colSpan": 6
+          },
+          "defaultValue": "$campaign.cooldownDays"
+        }
+      ],
+      "layout": {
+        "mode": "grid",
+        "columns": 12
+      }
+    }
+  ],
+  "settings": {
+    "validationMode": "onSubmit"
+  },
+  "dataSources": {
+    "campaign": {
+      "client": "rizz-calling",
+      "params": {
+        "lob": "REMITTANCE"
+      },
+      "endpoint": "get-campaign-config"
+    }
+  },
+  "description": "Pick a line of business and save. If that LOB has no campaign one is created and goes live; if its campaign is paused it is resumed; otherwise its live campaign is updated in place. Saving always leaves the chosen LOB serving, and pauses any other campaign that was serving it. Every change is recorded in the Audit Log with its old and new value, so previous configs stay recoverable.",
+  "submitConfig": {
+    "client": "rizz-calling",
+    "method": "POST",
+    "onError": {
+      "showNotification": true
+    },
+    "endpoint": "/pulse-service/api/v1/forms/rizz-campaign-config-form/submit",
+    "onSuccess": {
+      "closeDrawer": true,
+      "refreshPage": true,
+      "showNotification": true
+    },
+    "pathParams": {
+      "lob": "$formData.lob"
+    },
+    "operationId": "update-campaign-config",
+    "bodyTemplate": {
+      "name": "$formData.name",
+      "regions": "$formData.regions",
+      "createNew": "$formData.createNew",
+      "numAgents": "$formData.numAgents",
+      "poolLimit": "$formData.poolLimit",
+      "holdoutPct": "$formData.holdoutPct",
+      "cooldownDays": "$formData.cooldownDays",
+      "minSignupDays": "$formData.minSignupDays",
+      "retryWaitDays": "$formData.retryWaitDays",
+      "lifetimeCeiling": "$formData.lifetimeCeiling",
+      "ticketsPerAgent": "$formData.ticketsPerAgent",
+      "churnDaysThreshold": "$formData.churnDaysThreshold",
+      "overpushMultiplier": "$formData.overpushMultiplier"
+    },
+    "errorMessage": "Failed to save campaign configuration. Please try again.",
+    "successMessage": "Campaign saved and active for the selected LOB."
+  },
+  "schemaVersion": "1.0.0",
+  "validationSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+      "lob",
+      "name",
+      "numAgents",
+      "ticketsPerAgent",
+      "overpushMultiplier"
+    ],
+    "properties": {
+      "lob": {},
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "regions": {
+        "type": "string"
+      },
+      "numAgents": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "poolLimit": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "holdoutPct": {
+        "type": "number",
+        "maximum": 1,
+        "minimum": 0
+      },
+      "cooldownDays": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "minSignupDays": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "retryWaitDays": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "lifetimeCeiling": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "ticketsPerAgent": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "churnDaysThreshold": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "overpushMultiplier": {
+        "type": "number",
+        "minimum": 1
+      }
+    },
+    "errorMessage": {
+      "required": {
+        "lob": "Choose a line of business",
+        "name": "Campaign name is required",
+        "numAgents": "Number of agents is required",
+        "ticketsPerAgent": "Tickets per agent is required",
+        "overpushMultiplier": "Overpush multiplier is required"
+      }
+    }
+  }
+}
